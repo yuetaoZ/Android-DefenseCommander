@@ -4,4 +4,6 @@
     <string name="title">title</string>
     <string name="title_image">Title Image</string>
     <string name="base">base</string>
+    <string name="score">score</string>
+    <string name="level">level</string>
 </resources>
