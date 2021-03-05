@@ -6,15 +6,19 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int screenHeight;
-    private int screenWidth;
+    public static int screenHeight;
+    public static int screenWidth;
+    private ViewGroup layout;
+    private ImageView base1, base2, base3;
+    private int scoreValue;
+    private TextView score, level;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         setupFullScreen();
 
         getScreenDimensions();
+
+        setupBackgroundImage();
 
     }
 
@@ -46,5 +52,12 @@ public class MainActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenHeight = displayMetrics.heightPixels;
         screenWidth = displayMetrics.widthPixels;
+    }
+
+    private void setupBackgroundImage() {
+        layout = findViewById(R.id.layout);
+        score = findViewById(R.id.score);
+        level = findViewById(R.id.level);
+        new ScrollingBackground(this, layout, R.drawable.clouds, 30000);
     }
 }
