@@ -57,13 +57,12 @@ public class ScrollingBackground implements Runnable {
         backImageA.setZ(-1);
         backImageB.setZ(-1);
 
-        animateBack();
+        animateForward();
         //new Thread(this).start();
     }
 
     @Override
     public void run() {
-
 
         backImageA.setX(0);
         backImageB.setX(-(screenWidth + getBarHeight()));
@@ -104,24 +103,24 @@ public class ScrollingBackground implements Runnable {
         }
     }
 
-    private void animateBack() {
+    private void animateForward() {
 
         ValueAnimator animator = ValueAnimator.ofFloat(1.0f, 0.0f);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setInterpolator(new LinearInterpolator());
         animator.setDuration(duration);
+        float width = screenWidth + getBarHeight();
         final int[] alpha = {100};
         final int[] rate = {1};
 
         animator.addUpdateListener(animation -> {
             final float progress = (float) animation.getAnimatedValue();
-            float width = screenWidth + getBarHeight();
 
             float a_translationX = width * progress;
             float b_translationX = width * progress - width;
 
-            backImageA.setTranslationX(a_translationX);
-            backImageB.setTranslationX(b_translationX);
+            backImageA.setTranslationX(-a_translationX);
+            backImageB.setTranslationX(-b_translationX);
 
             if (alpha[0] > 220 || alpha[0] < 20) rate[0] = rate[0] * -1;
             alpha[0] = alpha[0] + rate[0];
