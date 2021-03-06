@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private int screenWidth;
     private MissileMaker missileMaker;
     private ViewGroup layout;
-    private ImageView base1, base2, base3;
+    private Base base1, base2, base3;
+    private ArrayList<Base> activeBases = new ArrayList<>();
     private int scoreValue;
     private TextView score, level;
 
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         getScreenDimensions();
 
         setupImages();
+
+        setupBases();
 
         setupOnTouchListener();
 
@@ -60,18 +64,34 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenHeight = displayMetrics.heightPixels;
-        screenWidth = displayMetrics.widthPixels;
+        screenWidth = displayMetrics.widthPixels + getBarHeight();
     }
 
     private void setupImages() {
         layout = findViewById(R.id.layout);
         score = findViewById(R.id.score);
         level = findViewById(R.id.level);
-        base1 = findViewById(R.id.base1);
-        base2 = findViewById(R.id.base2);
-        base3 = findViewById(R.id.base3);
 
         new CloudScroller(this, layout, R.drawable.clouds, 30000, screenHeight, screenWidth);
+    }
+
+    private void setupBases() {
+        base1 = new Base(findViewById(R.id.base1));
+        base1.setX((float) (screenWidth * 0.25));
+        base1.setY(screenHeight);
+        base2 = new Base(findViewById(R.id.base2));
+        base2.setX((float) (screenWidth * 0.5));
+        base2.setY(screenHeight);
+        base3 = new Base(findViewById(R.id.base3));
+        base3.setX((float) (screenWidth * 0.8));
+        base3.setY(screenHeight);
+        activeBases.add(base1);
+        activeBases.add(base2);
+        activeBases.add(base3);
+    }
+
+    public ArrayList<Base> getActiveBases() {
+        return activeBases;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -87,9 +107,10 @@ public class MainActivity extends AppCompatActivity {
     private void handleTouch(float x, float y) {
         ImageView launcher;
 
+        // TODO need to fix
         if (x < screenWidth * 0.375) {
             launcher = findViewById(R.id.base1);
-        } else if (x > screenWidth * 0.375 && x < screenWidth * 0.66) {
+        } else if (x < screenWidth * 0.66) {
             launcher = findViewById(R.id.base2);
         } else {
             launcher = findViewById(R.id.base3);
@@ -122,5 +143,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void removeMissile(Missile m) {
         missileMaker.removeMissile(m);
+    }
+
+    private int getBarHeight() {
+        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return getResources().getDimensionPixelSize(resourceId);
+        }
+        return 0;
     }
 }

@@ -8,10 +8,12 @@ import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+
 class Missile {
 
     private final MainActivity mainActivity;
-    private final ImageView imageView;
+    private final ImageView missileImageView;
     private final AnimatorSet aSet = new AnimatorSet();
     private final int screenHeight;
     private final int screenWidth;
@@ -26,16 +28,16 @@ class Missile {
         this.mainActivity = mainActivity;
 
 
-        imageView = new ImageView(mainActivity);
-        imageView.setY(-200);
-        imageView.setZ(-2);
+        missileImageView = new ImageView(mainActivity);
+        missileImageView.setY(-200);
+        missileImageView.setZ(-2);
 
-        mainActivity.runOnUiThread(() -> mainActivity.getLayout().addView(imageView));
+        mainActivity.runOnUiThread(() -> mainActivity.getLayout().addView(missileImageView));
 
     }
 
     AnimatorSet setData(final int drawId) {
-        mainActivity.runOnUiThread(() -> imageView.setImageResource(drawId));
+        mainActivity.runOnUiThread(() -> missileImageView.setImageResource(drawId));
 
         int startX = (int) (Math.random() * screenWidth);
         int endX = (int) (Math.random() * screenWidth);
@@ -43,10 +45,10 @@ class Missile {
         int endY = screenHeight - 100;
 
         float a = calculateAngle(startX, startY, endX, endY);
-        imageView.setRotation(a);
+        missileImageView.setRotation(a);
 
 
-        ObjectAnimator xAnim = ObjectAnimator.ofFloat(imageView, "x", startX, endX);
+        ObjectAnimator xAnim = ObjectAnimator.ofFloat(missileImageView, "x", startX, endX);
         xAnim.setInterpolator(new LinearInterpolator());
         xAnim.setDuration(screenTime);
         xAnim.addListener(new AnimatorListenerAdapter() {
@@ -54,8 +56,11 @@ class Missile {
             public void onAnimationEnd(Animator animation) {
                 mainActivity.runOnUiThread(() -> {
                     if (!hit) {
-                        interceptorBlast(imageView.getX(), imageView.getY());
-                        mainActivity.removeMissile(Missile.this);
+                        if (!hittedBase()) {
+                            interceptorBlast(missileImageView.getX(), missileImageView.getY());
+                            SoundPlayer.getInstance().start("missile_miss");
+                            mainActivity.removeMissile(Missile.this);
+                        }
                     }
                     Log.d(TAG, "run: NUM VIEWS " +
                             mainActivity.getLayout().getChildCount());
@@ -64,7 +69,7 @@ class Missile {
             }
         });
 
-        ObjectAnimator yAnim = ObjectAnimator.ofFloat(imageView, "y", startY, endY);
+        ObjectAnimator yAnim = ObjectAnimator.ofFloat(missileImageView, "y", startY, endY);
         yAnim.setInterpolator(new LinearInterpolator());
         yAnim.setDuration(screenTime);
 
@@ -73,24 +78,78 @@ class Missile {
 
     }
 
+    private boolean hittedBase() {
+        ArrayList<Base> activeBases = mainActivity.getActiveBases();
+        for (Base b: activeBases) {
+            float x1 = (int) b.getX();
+            float y1 = (int) b.getY();
+            float x2 = (int) (missileImageView.getX() + (0.5 * missileImageView.getWidth()));
+            float y2 = (int) (missileImageView.getY() + (0.5 * missileImageView.getHeight()));
+
+            float f = (float) Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+
+            if (f < 180) {
+                baseBlast(b);
+                activeBases.remove(b);
+                interceptorBlast(missileImageView.getX(), missileImageView.getY());
+                mainActivity.removeMissile(Missile.this);
+                if (activeBases.size() == 0) gameOver();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void gameOver() {
+    }
+
+    private void baseBlast(Base b) {
+        SoundPlayer.getInstance().start("base_blast");
+        mainActivity.getLayout().removeView(b.getImageView());
+        final ImageView explodeView = new ImageView(mainActivity);
+        explodeView.setImageResource(R.drawable.blast);
+
+        explodeView.setTransitionName("Base blast");
+
+        float w = explodeView.getDrawable().getIntrinsicWidth();
+        explodeView.setX(b.getX() - (w/2));
+
+        explodeView.setY(b.getY() - (w/2));
+
+        explodeView.setZ(-2);
+
+        mainActivity.getLayout().addView(explodeView);
+
+        final ObjectAnimator alpha = ObjectAnimator.ofFloat(explodeView, "alpha", 0.0f);
+        alpha.setInterpolator(new LinearInterpolator());
+        alpha.setDuration(3000);
+        alpha.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mainActivity.getLayout().removeView(explodeView);
+            }
+        });
+        alpha.start();
+    }
+
     void stop() {
         aSet.cancel();
     }
 
     float getX() {
-        return imageView.getX();
+        return missileImageView.getX();
     }
 
     float getY() {
-        return imageView.getY();
+        return missileImageView.getY();
     }
 
     float getWidth() {
-        return imageView.getWidth();
+        return missileImageView.getWidth();
     }
 
     float getHeight() {
-        return imageView.getHeight();
+        return missileImageView.getHeight();
     }
 
     void setHit(boolean b) { hit = b; }
@@ -102,7 +161,7 @@ class Missile {
 
         iv.setTransitionName("Missile Intercepted Blast");
 
-        int w = imageView.getDrawable().getIntrinsicWidth();
+        int w = missileImageView.getDrawable().getIntrinsicWidth();
         int offset = (int) (w * 0.5);
 
         iv.setX(x - offset);
@@ -112,7 +171,7 @@ class Missile {
 
         aSet.cancel();
 
-        mainActivity.getLayout().removeView(imageView);
+        mainActivity.getLayout().removeView(missileImageView);
         mainActivity.getLayout().addView(iv);
 
         final ObjectAnimator alpha = ObjectAnimator.ofFloat(iv, "alpha", 0.0f);
@@ -121,7 +180,6 @@ class Missile {
         alpha.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mainActivity.getLayout().removeView(imageView);
                 mainActivity.getLayout().removeView(iv);
             }
         });

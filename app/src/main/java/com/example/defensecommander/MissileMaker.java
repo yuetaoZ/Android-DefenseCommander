@@ -45,6 +45,7 @@ public class MissileMaker implements Runnable {
             final AnimatorSet as = missile.setData(resId);
 
             mainActivity.runOnUiThread(as::start);
+            SoundPlayer.getInstance().start("launch_missile");
 
             try {
                 Thread.sleep((long) (delay * 0.333));
@@ -96,7 +97,7 @@ public class MissileMaker implements Runnable {
 
             if (f < INTERCEPTOR_BLAST) {
 
-                SoundPlayer.getInstance().start("interceptor_hit_plane");
+                SoundPlayer.getInstance().start("interceptor_hit_missile");
                 mainActivity.incrementScore();
                 Log.d(TAG, "applyInterceptorBlast:    Hit: " + f);
                 m.setHit(true);
