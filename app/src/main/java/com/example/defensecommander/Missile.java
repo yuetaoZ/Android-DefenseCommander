@@ -93,14 +93,11 @@ class Missile {
                 activeBases.remove(b);
                 interceptorBlast(missileImageView.getX(), missileImageView.getY());
                 mainActivity.removeMissile(Missile.this);
-                if (activeBases.size() == 0) gameOver();
+                if (activeBases.size() == 0) mainActivity.gameOver();
                 return true;
             }
         }
         return false;
-    }
-
-    private void gameOver() {
     }
 
     private void baseBlast(Base b) {

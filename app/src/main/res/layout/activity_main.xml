@@ -73,4 +73,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <ImageView
+        android:id="@+id/titleImageGameOver"
+        android:layout_width="540dp"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toBottomOf="@+id/base2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/game_over"
+        android:contentDescription="@string/title_gameOver" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

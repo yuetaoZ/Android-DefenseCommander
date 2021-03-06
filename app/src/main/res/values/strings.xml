@@ -6,4 +6,5 @@
     <string name="base">base</string>
     <string name="score">score</string>
     <string name="level">level</string>
+    <string name="title_gameOver">Title gameover</string>
 </resources>
