@@ -20,10 +20,11 @@ public class MainActivity extends AppCompatActivity {
 
     private int screenHeight;
     private int screenWidth;
+    private float leftScreenPart, midScreenPart, rightScreenPart;
+    private Base base1, base2, base3;
     private MissileMaker missileMaker;
     private ViewGroup layout;
-    private Base base1, base2, base3;
-    private ArrayList<Base> activeBases = new ArrayList<>();
+    private final ArrayList<Base> activeBases = new ArrayList<>();
     private int scoreValue;
     private TextView score, level;
 
@@ -42,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
         setupOnTouchListener();
 
-        missileMaker = new MissileMaker(this, screenWidth, screenHeight);
-        new Thread(missileMaker).start();
+        launchMissileMaker();
+
     }
 
     private void setupFullScreen() {
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenHeight = displayMetrics.heightPixels;
         screenWidth = displayMetrics.widthPixels + getBarHeight();
+        leftScreenPart = (float) (screenWidth * 0.33);
+        midScreenPart = (float) (screenWidth * 0.5);
+        rightScreenPart = (float) (screenWidth * 0.66);
     }
 
     private void setupImages() {
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         base3 = new Base(findViewById(R.id.base3));
         base3.setX((float) (screenWidth * 0.8));
         base3.setY(screenHeight);
+
         activeBases.add(base1);
         activeBases.add(base2);
         activeBases.add(base3);
@@ -107,13 +112,40 @@ public class MainActivity extends AppCompatActivity {
     private void handleTouch(float x, float y) {
         ImageView launcher;
 
-        // TODO need to fix
-        if (x < screenWidth * 0.375) {
-            launcher = findViewById(R.id.base1);
-        } else if (x < screenWidth * 0.66) {
-            launcher = findViewById(R.id.base2);
+        if (x < leftScreenPart) {
+            if (activeBases.contains(base1)) {
+                launcher = findViewById(R.id.base1);
+            } else if (activeBases.contains(base2)) {
+                launcher = findViewById(R.id.base2);
+            } else {
+                launcher = findViewById(R.id.base3);
+            }
+        } else if (x < rightScreenPart) {
+            if (activeBases.contains(base2)) {
+                launcher = findViewById(R.id.base2);
+            } else {
+                if (x < midScreenPart) {
+                    if (activeBases.contains(base1)) {
+                        launcher = findViewById(R.id.base1);
+                    } else {
+                        launcher = findViewById(R.id.base3);
+                    }
+                } else {
+                    if (activeBases.contains(base3)) {
+                        launcher = findViewById(R.id.base3);
+                    } else {
+                        launcher = findViewById(R.id.base1);
+                    }
+                }
+            }
         } else {
-            launcher = findViewById(R.id.base3);
+            if (activeBases.contains(base3)) {
+                launcher = findViewById(R.id.base3);
+            } else if (activeBases.contains(base2)) {
+                launcher = findViewById(R.id.base2);
+            } else {
+                launcher = findViewById(R.id.base1);
+            }
         }
 
         double startX = launcher.getX() + (0.5 * launcher.getWidth());
@@ -122,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
         Interceptor i = new Interceptor(this,  (float) (startX - 10), (float) (startY - 30), x, y);
         SoundPlayer.getInstance().start("launch_interceptor");
         i.launch();
+    }
+
+    private void launchMissileMaker() {
+        missileMaker = new MissileMaker(this, screenWidth, screenHeight);
+        new Thread(missileMaker).start();
     }
 
     public ViewGroup getLayout() {
@@ -151,5 +188,9 @@ public class MainActivity extends AppCompatActivity {
             return getResources().getDimensionPixelSize(resourceId);
         }
         return 0;
+    }
+
+    public void setRunning(boolean running) {
+        missileMaker.setRunning(running);
     }
 }
