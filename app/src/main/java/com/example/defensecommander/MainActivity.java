@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fadeInGameOverTitle() {
         ImageView titleImageView= findViewById(R.id.titleImageGameOver);
+        titleImageView.setVisibility(View.VISIBLE);
         Animation myFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadein);
         titleImageView.startAnimation(myFadeInAnimation);
     }
