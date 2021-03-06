@@ -17,8 +17,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static int screenHeight;
-    public static int screenWidth;
+    private int screenHeight;
+    private int screenWidth;
     private MissileMaker missileMaker;
     private ViewGroup layout;
     private ImageView base1, base2, base3;
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         base2 = findViewById(R.id.base2);
         base3 = findViewById(R.id.base3);
 
-        new CloudScroller(this, layout, R.drawable.clouds, 30000);
+        new CloudScroller(this, layout, R.drawable.clouds, 30000, screenHeight, screenWidth);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
     private void handleTouch(float x, float y) {
         ImageView launcher;
 
-        if (x < screenWidth * 0.33) {
+        if (x < screenWidth * 0.375) {
             launcher = findViewById(R.id.base1);
-        } else if (x > screenWidth * 0.33 && x < screenWidth * 0.66) {
+        } else if (x > screenWidth * 0.375 && x < screenWidth * 0.66) {
             launcher = findViewById(R.id.base2);
         } else {
             launcher = findViewById(R.id.base3);

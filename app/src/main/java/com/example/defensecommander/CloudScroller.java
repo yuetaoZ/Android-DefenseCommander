@@ -10,9 +10,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import static com.example.defensecommander.MainActivity.screenHeight;
-import static com.example.defensecommander.MainActivity.screenWidth;
-
 public class CloudScroller implements Runnable {
 
     private final Context context;
@@ -21,14 +18,18 @@ public class CloudScroller implements Runnable {
     private ImageView backImageB;
     private final long duration;
     private final int resId;
+    private final int screenHeight;
+    private final int screenWidth;
     private static final String TAG = "ParallaxBackground";
 
 
-    CloudScroller(Context context, ViewGroup layout, int resId, long duration) {
+    CloudScroller(Context context, ViewGroup layout, int resId, long duration, int screenHeight, int screenWidth) {
         this.context = context;
         this.layout = layout;
         this.resId = resId;
         this.duration = duration;
+        this.screenHeight = screenHeight;
+        this.screenWidth = screenWidth;
 
         setupBackground();
     }

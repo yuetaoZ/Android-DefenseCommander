@@ -42,7 +42,7 @@ class Interceptor {
 
         imageview.setX(startX);
         imageview.setY(startY);
-        imageview.setZ(0);
+        imageview.setZ(-2);
 
         endX -= www;
         endY -= www;
@@ -86,7 +86,7 @@ class Interceptor {
 
         explodeView.setY(this.getY() - (w/2));
 
-        explodeView.setZ(-15);
+        explodeView.setZ(-2);
 
         mainActivity.getLayout().addView(explodeView);
 

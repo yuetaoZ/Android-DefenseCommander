@@ -39,9 +39,8 @@ public class MissileMaker implements Runnable {
 
             int resId = pickMissile();
 
-
-            long planeTime = (long) ((delay * 0.5) + (Math.random() * delay));
-            final Missile missile = new Missile(screenWidth, screenHeight, planeTime, mainActivity);
+            long missileTime = (long) ((delay * 0.5) + (Math.random() * delay));
+            final Missile missile = new Missile(screenWidth, screenHeight, missileTime, mainActivity);
             activeMissiles.add(missile);
             final AnimatorSet as = missile.setData(resId);
 
@@ -100,6 +99,7 @@ public class MissileMaker implements Runnable {
                 SoundPlayer.getInstance().start("interceptor_hit_plane");
                 mainActivity.incrementScore();
                 Log.d(TAG, "applyInterceptorBlast:    Hit: " + f);
+                m.setHit(true);
                 m.interceptorBlast(x2, y2);
                 nowGone.add(m);
             }

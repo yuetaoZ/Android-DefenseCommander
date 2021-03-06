@@ -16,8 +16,8 @@ class Missile {
     private final int screenHeight;
     private final int screenWidth;
     private final long screenTime;
-    private static final String TAG = "Plane";
-    private final boolean hit = false;
+    private static final String TAG = "Missile";
+    private boolean hit = false;
 
     Missile(int screenWidth, int screenHeight, long screenTime, final MainActivity mainActivity) {
         this.screenWidth = screenWidth;
@@ -27,7 +27,8 @@ class Missile {
 
 
         imageView = new ImageView(mainActivity);
-        imageView.setY(-500);
+        imageView.setY(-200);
+        imageView.setZ(-2);
 
         mainActivity.runOnUiThread(() -> mainActivity.getLayout().addView(imageView));
 
@@ -39,7 +40,10 @@ class Missile {
         int startX = (int) (Math.random() * screenWidth);
         int endX = (int) (Math.random() * screenWidth);
         int startY = -200;
-        int endY = screenHeight + 200;
+        int endY = screenHeight - 100;
+
+        float a = calculateAngle(startX, startY, endX, endY);
+        imageView.setRotation(a);
 
 
         ObjectAnimator xAnim = ObjectAnimator.ofFloat(imageView, "x", startX, endX);
@@ -50,7 +54,7 @@ class Missile {
             public void onAnimationEnd(Animator animation) {
                 mainActivity.runOnUiThread(() -> {
                     if (!hit) {
-                        mainActivity.getLayout().removeView(imageView);
+                        interceptorBlast(imageView.getX(), imageView.getY());
                         mainActivity.removeMissile(Missile.this);
                     }
                     Log.d(TAG, "run: NUM VIEWS " +
@@ -89,6 +93,8 @@ class Missile {
         return imageView.getHeight();
     }
 
+    void setHit(boolean b) { hit = b; }
+
     void interceptorBlast(float x, float y) {
 
         final ImageView iv = new ImageView(mainActivity);
@@ -101,6 +107,7 @@ class Missile {
 
         iv.setX(x - offset);
         iv.setY(y - offset);
+        iv.setZ(-2);
         iv.setRotation((float) (360.0 * Math.random()));
 
         aSet.cancel();
@@ -115,8 +122,16 @@ class Missile {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mainActivity.getLayout().removeView(imageView);
+                mainActivity.getLayout().removeView(iv);
             }
         });
         alpha.start();
+    }
+
+    private float calculateAngle(double x1, double y1, double x2, double y2) {
+        double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1));
+        // Keep angle between 0 and 360
+        angle = angle + Math.ceil(-angle / 360) * 360;
+        return (float) (180.0f - angle);
     }
 }
