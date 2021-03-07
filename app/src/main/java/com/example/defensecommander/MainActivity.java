@@ -217,6 +217,13 @@ public class MainActivity extends AppCompatActivity {
         new Thread(dbh).start();
     }
 
+    public void updateScore(String s) {
+        int lowestScore = Integer.parseInt(s);
+        if (scoreValue < lowestScore) {
+            // Dialog
+        }
+    }
+
     public void setResults(String s) {
         Intent intent = new Intent();
         intent.putExtra("DATA", s);

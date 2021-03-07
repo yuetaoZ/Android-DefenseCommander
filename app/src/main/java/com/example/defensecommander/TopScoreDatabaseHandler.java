@@ -40,10 +40,8 @@ public class TopScoreDatabaseHandler implements Runnable {
             StringBuilder sb = new StringBuilder();
 
             if (level == -1) {
-                sb.append(getAll());
-
-                context.setResults(sb.toString());
-                conn.close();
+                sb.append(getLowestScore());
+                context.updateScore(sb.toString());
             } else {
                 Statement stmt = conn.createStatement();
 
@@ -61,8 +59,8 @@ public class TopScoreDatabaseHandler implements Runnable {
                 sb.append(getAll());
 
                 context.setResults(sb.toString());
-                conn.close();
             }
+            conn.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,5 +90,28 @@ public class TopScoreDatabaseHandler implements Runnable {
         return sb.toString();
     }
 
+    private String getLowestScore() throws SQLException {
+        Statement stmt = conn.createStatement();
+
+        String sql = "select * from " + SCORES_TABLE + "  ORDER BY Score DESC LIMIT 10";
+
+        StringBuilder sb = new StringBuilder();
+
+        ResultSet rs = stmt.executeQuery(sql);
+        int rank = 1;
+        int lowestScore;
+        while (rs.next()) {
+            rank++;
+            int score = rs.getInt(3);
+            if (rank == 10) {
+                lowestScore = score;
+                sb.append(lowestScore);
+            }
+        }
+        rs.close();
+        stmt.close();
+
+        return sb.toString();
+    }
 
 }
