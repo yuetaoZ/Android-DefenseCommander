@@ -3,6 +3,8 @@ package com.example.defensecommander;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -195,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
     public void gameOver() {
         missileMaker.setRunning(false);
         fadeInGameOverTitle();
+        checkScore();
     }
 
     private void fadeInGameOverTitle() {
@@ -202,5 +205,21 @@ public class MainActivity extends AppCompatActivity {
         titleImageView.setVisibility(View.VISIBLE);
         Animation myFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadein);
         titleImageView.startAnimation(myFadeInAnimation);
+    }
+
+    private void checkScore() {
+        // compare scoreValue with 10th score.
+        String initials = "";
+        int score = 0;
+        int level = -1;
+        TopScoreDatabaseHandler dbh =
+                new TopScoreDatabaseHandler(this, initials, score, level);
+        new Thread(dbh).start();
+    }
+
+    public void setResults(String s) {
+        Intent intent = new Intent();
+        intent.putExtra("DATA", s);
+
     }
 }
