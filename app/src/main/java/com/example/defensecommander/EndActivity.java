@@ -47,11 +47,11 @@ public class EndActivity extends AppCompatActivity {
 
     public void setUpExitButton() {
         Button button = (Button) findViewById(R.id.exitBtn);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                System.exit(0);
-            }
+        button.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra("EXIT", true);
+            startActivity(intent);
         });
     }
 }

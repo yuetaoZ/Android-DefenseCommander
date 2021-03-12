@@ -1,15 +1,10 @@
 package com.example.defensecommander;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -21,6 +16,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -42,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
 
         setupFullScreen();
 
@@ -240,22 +241,16 @@ public class MainActivity extends AppCompatActivity {
 
             alert.setView(edittext);
 
-            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    String initials = edittext.getText().toString();
-                    String levelStr = level.getText().toString();
-                    int levelValue = Integer.parseInt(levelStr.substring(7));
-                    TopScoreDatabaseHandler dbh =
-                            new TopScoreDatabaseHandler(MainActivity.this, initials, scoreValue, levelValue);
-                    new Thread(dbh).start();
-                }
+            alert.setPositiveButton("OK", (dialog, whichButton) -> {
+                String initials = edittext.getText().toString();
+                String levelStr = level.getText().toString();
+                int levelValue = Integer.parseInt(levelStr.substring(7));
+                TopScoreDatabaseHandler dbh =
+                        new TopScoreDatabaseHandler(MainActivity.this, initials, scoreValue, levelValue);
+                new Thread(dbh).start();
             });
 
-            alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    setResults(topInfo.getTopPlayerInfo());
-                }
-            });
+            alert.setNegativeButton("CANCEL", (dialog, whichButton) -> setResults(topInfo.getTopPlayerInfo()));
 
             alert.show();
         } else {
