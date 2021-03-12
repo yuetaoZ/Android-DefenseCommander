@@ -4,9 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -152,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        if (launcher == null) return;
+
         double startX = launcher.getX() + (0.5 * launcher.getWidth());
         double startY = launcher.getY() + (0.5 * launcher.getHeight());
 
@@ -210,23 +217,52 @@ public class MainActivity extends AppCompatActivity {
     private void checkScore() {
         // compare scoreValue with 10th score.
         String initials = "";
-        int score = 0;
-        int level = -1;
         TopScoreDatabaseHandler dbh =
-                new TopScoreDatabaseHandler(this, initials, score, level);
+                new TopScoreDatabaseHandler(this, initials, 0, -1);
         new Thread(dbh).start();
     }
 
-    public void updateScore(String s) {
-        int lowestScore = Integer.parseInt(s);
-        if (scoreValue < lowestScore) {
-            // Dialog
+
+    public void reportAndUpdateScore(TopPlayerInfo topInfo) {
+        int lowestScore = topInfo.getLowestScore();
+        if (scoreValue > lowestScore) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            final EditText edittext = new EditText(getApplicationContext());
+            int maxLength = 3;
+            edittext.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+
+            alert.setMessage("Please enter your initials (up to 3 characters)");
+            alert.setTitle("You are a Top-Player!");
+
+            alert.setView(edittext);
+
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String initials = edittext.getText().toString();
+                    String levelStr = level.getText().toString();
+                    int levelValue = Integer.parseInt(levelStr.substring(7));
+                    TopScoreDatabaseHandler dbh =
+                            new TopScoreDatabaseHandler(MainActivity.this, initials, scoreValue, levelValue);
+                    new Thread(dbh).start();
+                }
+            });
+
+            alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    setResults(topInfo.getTopPlayerInfo());
+                }
+            });
+
+            alert.show();
+        } else {
+            setResults(topInfo.getTopPlayerInfo());
         }
     }
 
     public void setResults(String s) {
-        Intent intent = new Intent();
-        intent.putExtra("DATA", s);
-
+        Intent intent = new Intent(this, EndActivity.class);
+        intent.putExtra("TopPlayer_DATA", s);
+        startActivity(intent);
     }
 }

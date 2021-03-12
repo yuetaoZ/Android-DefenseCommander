@@ -1,5 +1,8 @@
 package com.example.defensecommander;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -37,28 +40,22 @@ public class TopScoreDatabaseHandler implements Runnable {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(dbURL, "chri5558_student", "ABC.123");
 
-            StringBuilder sb = new StringBuilder();
-
-            if (level == -1) {
-                sb.append(getLowestScore());
-                context.updateScore(sb.toString());
-            } else {
+            if (level != -1) {
                 Statement stmt = conn.createStatement();
 
                 String sql = "insert into " + SCORES_TABLE + " values (" +
                         System.currentTimeMillis() + ", '" + initials + "', " + score + ", " +
                         level + ")";
 
-                int result = stmt.executeUpdate(sql);
+                stmt.executeUpdate(sql);
 
                 stmt.close();
 
-                String response = "Player " + initials + " added (" + result + " record)\n\n";
-
-                sb.append(response);
-                sb.append(getAll());
-
-                context.setResults(sb.toString());
+                TopPlayerInfo topInfo = getAll();
+                context.setResults(topInfo.getTopPlayerInfo());
+            } else {
+                TopPlayerInfo topInfo = getAll();
+                new Handler(Looper.getMainLooper()).post(() -> context.reportAndUpdateScore(topInfo));
             }
             conn.close();
         } catch (Exception e) {
@@ -67,51 +64,39 @@ public class TopScoreDatabaseHandler implements Runnable {
 
     }
 
-    private String getAll() throws SQLException {
+    private TopPlayerInfo getAll() throws SQLException {
+        TopPlayerInfo topInfo = new TopPlayerInfo();
+
         Statement stmt = conn.createStatement();
 
         String sql = "select * from " + SCORES_TABLE + "  ORDER BY Score DESC LIMIT 10";
 
         StringBuilder sb = new StringBuilder();
 
+        String response = String.format(Locale.getDefault(),
+                "%-15s %-15s %-15s %-15s %15s %n", "#", "Init", "Level", "Score", "Date/Time");
+        sb.append(response);
+
         ResultSet rs = stmt.executeQuery(sql);
         int rank = 1;
+        int lowestScore = 0;
         while (rs.next()) {
             long millis = rs.getLong(1);
             String initials = rs.getString(2);
             int score = rs.getInt(3);
             int level = rs.getInt(4);
+            lowestScore = score;
             sb.append(String.format(Locale.getDefault(),
-                    "%-10d %-12s %8s %8s %12s%n", rank++, initials, level, score, sdf.format(new Date(millis))));
+                    "%-15s %-15S %-15s %-15s %20s %n", rank++, initials.trim(), level, score, sdf.format(new Date(millis))));
         }
         rs.close();
         stmt.close();
 
-        return sb.toString();
-    }
+        String topPlayerInfo = sb.toString();
+        topInfo.setLowestScore(lowestScore);
+        topInfo.setTopPlayerInfo(topPlayerInfo);
 
-    private String getLowestScore() throws SQLException {
-        Statement stmt = conn.createStatement();
-
-        String sql = "select * from " + SCORES_TABLE + "  ORDER BY Score DESC LIMIT 10";
-
-        StringBuilder sb = new StringBuilder();
-
-        ResultSet rs = stmt.executeQuery(sql);
-        int rank = 1;
-        int lowestScore;
-        while (rs.next()) {
-            rank++;
-            int score = rs.getInt(3);
-            if (rank == 10) {
-                lowestScore = score;
-                sb.append(lowestScore);
-            }
-        }
-        rs.close();
-        stmt.close();
-
-        return sb.toString();
+        return topInfo;
     }
 
 }
