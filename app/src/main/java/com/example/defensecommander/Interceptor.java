@@ -67,6 +67,7 @@ class Interceptor {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mainActivity.getLayout().removeView(imageview);
+                mainActivity.decreaseInterceptorInFlight();
                 makeBlast();
             }
         });

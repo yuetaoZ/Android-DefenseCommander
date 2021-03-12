@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private final ArrayList<Base> activeBases = new ArrayList<>();
     private int scoreValue;
     private TextView score, level;
+    private int interceptorInFlight = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleTouch(float x, float y) {
+        if (interceptorInFlight >= 3) return;
+        interceptorInFlight++;
         ImageView launcher;
 
         if (x < leftScreenPart) {
@@ -264,5 +267,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EndActivity.class);
         intent.putExtra("TopPlayer_DATA", s);
         startActivity(intent);
+    }
+
+    public void decreaseInterceptorInFlight() {
+        interceptorInFlight--;
     }
 }
