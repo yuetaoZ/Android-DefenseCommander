@@ -2,6 +2,7 @@ package com.example.defensecommander;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -10,12 +11,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class EndActivity extends AppCompatActivity {
+public class ResultActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_end);
+        setContentView(R.layout.activity_result);
 
         setupFullScreen();
 
@@ -42,6 +43,7 @@ public class EndActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String player_data = intent.getStringExtra("TopPlayer_DATA");
         TextView textView = findViewById(R.id.playerInfo);
+        textView.setTypeface(Typeface.MONOSPACE);
         textView.setText(player_data);
     }
 

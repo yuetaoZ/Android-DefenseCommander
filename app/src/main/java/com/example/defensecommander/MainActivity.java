@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setResults(String s) {
-        Intent intent = new Intent(this, EndActivity.class);
+        Intent intent = new Intent(this, ResultActivity.class);
         intent.putExtra("TopPlayer_DATA", s);
         startActivity(intent);
     }

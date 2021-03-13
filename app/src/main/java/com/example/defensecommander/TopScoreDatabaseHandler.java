@@ -74,7 +74,7 @@ public class TopScoreDatabaseHandler implements Runnable {
         StringBuilder sb = new StringBuilder();
 
         String response = String.format(Locale.getDefault(),
-                "%-15s %-15s %-15s %-15s %15s %n", "#", "Init", "Level", "Score", "Date/Time");
+                "%5s %7s %7s %7s %15s %n", "#", "Init", "Level", "Score", "Date/Time");
         sb.append(response);
 
         ResultSet rs = stmt.executeQuery(sql);
@@ -87,7 +87,7 @@ public class TopScoreDatabaseHandler implements Runnable {
             int level = rs.getInt(4);
             lowestScore = score;
             sb.append(String.format(Locale.getDefault(),
-                    "%-15s %-15S %-15s %-15s %20s %n", rank++, initials.trim(), level, score, sdf.format(new Date(millis))));
+                    "%5s %7S %7s %7s %15s %n", rank++, initials.trim(), level, score, sdf.format(new Date(millis))));
         }
         rs.close();
         stmt.close();
