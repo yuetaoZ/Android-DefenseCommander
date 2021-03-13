@@ -11,14 +11,15 @@ import java.util.ArrayList;
 public class Base {
     private float x;
     private float y;
-    private ImageView imageView;
-    private MainActivity mainActivity;
-    private ArrayList<Base> activeBases;
+    private final ImageView imageView;
+    private final MainActivity mainActivity;
+    private final ArrayList<Base> activeBases;
 
     public Base(MainActivity mainActivity, ImageView view, ArrayList<Base> activeBases) {
         this.mainActivity = mainActivity;
         this.imageView = view;
         this.activeBases = activeBases;
+        activeBases.add(this);
     }
 
     public float getX() {
@@ -43,7 +44,6 @@ public class Base {
 
     public void baseBlast() {
         SoundPlayer.getInstance().start("base_blast");
-        mainActivity.getLayout().removeView(this.getImageView());
         final ImageView explodeView = new ImageView(mainActivity);
         explodeView.setImageResource(R.drawable.blast);
 
@@ -69,9 +69,5 @@ public class Base {
         });
         alpha.start();
 
-
-        activeBases.remove(this);
-
-        if (activeBases.size() == 0) mainActivity.gameOver();
     }
 }

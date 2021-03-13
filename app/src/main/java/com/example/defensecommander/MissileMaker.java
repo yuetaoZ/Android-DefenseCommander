@@ -100,7 +100,7 @@ public class MissileMaker implements Runnable {
                 SoundPlayer.getInstance().start("interceptor_hit_missile");
                 mainActivity.incrementScore();
                 Log.d(TAG, "applyInterceptorBlast:    Hit: " + f);
-                m.setHit(true);
+                m.hitByInterceptor();
                 m.interceptorBlast(x2, y2);
                 nowGone.add(m);
             }

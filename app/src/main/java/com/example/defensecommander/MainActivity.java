@@ -100,10 +100,6 @@ public class MainActivity extends AppCompatActivity {
         base3 = new Base(this, findViewById(R.id.base3), activeBases);
         base3.setX((float) (screenWidth * 0.8));
         base3.setY(screenHeight);
-
-        activeBases.add(base1);
-        activeBases.add(base2);
-        activeBases.add(base3);
     }
 
     public ArrayList<Base> getActiveBases() {

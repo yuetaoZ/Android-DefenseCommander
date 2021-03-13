@@ -19,7 +19,7 @@ class Missile {
     private final int screenWidth;
     private final long screenTime;
     private static final String TAG = "Missile";
-    private boolean hit = false;
+    private boolean hitByInterceptor = false;
 
     Missile(int screenWidth, int screenHeight, long screenTime, final MainActivity mainActivity) {
         this.screenWidth = screenWidth;
@@ -55,7 +55,7 @@ class Missile {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mainActivity.runOnUiThread(() -> {
-                    if (!hit) {
+                    if (!hitByInterceptor) {
                         if (!hittedBase()) {
                             interceptorBlast(missileImageView.getX(), missileImageView.getY());
                             SoundPlayer.getInstance().start("missile_miss");
@@ -80,6 +80,7 @@ class Missile {
 
     private boolean hittedBase() {
         ArrayList<Base> activeBases = mainActivity.getActiveBases();
+        ArrayList<Base> toRemoveBases = new ArrayList<>();
         for (Base b: activeBases) {
             float x1 = (int) b.getX();
             float y1 = (int) b.getY();
@@ -89,12 +90,22 @@ class Missile {
             float f = (float) Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
 
             if (f < 180) {
+                toRemoveBases.add(b);
+            }
+        }
+
+        if (!toRemoveBases.isEmpty()) {
+            for (Base b: toRemoveBases) {
                 b.baseBlast();
+                mainActivity.getLayout().removeView(b.getImageView());
+                activeBases.remove(b);
                 interceptorBlast(missileImageView.getX(), missileImageView.getY());
                 mainActivity.removeMissile(Missile.this);
+                if (activeBases.size() == 0) mainActivity.gameOver();
                 return true;
             }
         }
+
         return false;
     }
 
@@ -119,7 +130,7 @@ class Missile {
         return missileImageView.getHeight();
     }
 
-    void setHit(boolean b) { hit = b; }
+    void hitByInterceptor() { hitByInterceptor = true; }
 
     void interceptorBlast(float x, float y) {
 

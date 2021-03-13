@@ -71,6 +71,7 @@ class Interceptor {
                 mainActivity.getLayout().removeView(imageview);
                 mainActivity.decreaseInterceptorInFlight();
                 makeBlast();
+                checkHitBase();
             }
         });
 
@@ -105,12 +106,11 @@ class Interceptor {
         alpha.start();
 
         mainActivity.applyInterceptorBlast(this, imageview.getId());
-
-        checkHitBase();
     }
 
-    private boolean checkHitBase() {
+    private void checkHitBase() {
         ArrayList<Base> activeBases = mainActivity.getActiveBases();
+        ArrayList<Base> toRemoveBases = new ArrayList<>();
         for (Base b: activeBases) {
             float x1 = (int) b.getX();
             float y1 = (int) b.getY();
@@ -120,11 +120,16 @@ class Interceptor {
             float f = (float) Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
 
             if (f < 180) {
-                b.baseBlast();
-                return true;
+                toRemoveBases.add(b);
             }
         }
-        return false;
+
+        for (Base b: toRemoveBases) {
+            b.baseBlast();
+            mainActivity.getLayout().removeView(b.getImageView());
+            activeBases.remove(b);
+            if (activeBases.size() == 0) mainActivity.gameOver();
+        }
     }
 
     void launch() {
