@@ -7,6 +7,8 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+
 class Interceptor {
 
     private static int count = 0;
@@ -103,6 +105,26 @@ class Interceptor {
         alpha.start();
 
         mainActivity.applyInterceptorBlast(this, imageview.getId());
+
+        checkHitBase();
+    }
+
+    private boolean checkHitBase() {
+        ArrayList<Base> activeBases = mainActivity.getActiveBases();
+        for (Base b: activeBases) {
+            float x1 = (int) b.getX();
+            float y1 = (int) b.getY();
+            float x2 = (int) (imageview.getX() + (0.5 * imageview.getWidth()));
+            float y2 = (int) (imageview.getY() + (0.5 * imageview.getHeight()));
+
+            float f = (float) Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+
+            if (f < 180) {
+                b.baseBlast();
+                return true;
+            }
+        }
+        return false;
     }
 
     void launch() {

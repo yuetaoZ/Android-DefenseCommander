@@ -91,13 +91,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupBases() {
-        base1 = new Base(findViewById(R.id.base1));
+        base1 = new Base(this, findViewById(R.id.base1), activeBases);
         base1.setX((float) (screenWidth * 0.25));
         base1.setY(screenHeight);
-        base2 = new Base(findViewById(R.id.base2));
+        base2 = new Base(this, findViewById(R.id.base2), activeBases);
         base2.setX((float) (screenWidth * 0.5));
         base2.setY(screenHeight);
-        base3 = new Base(findViewById(R.id.base3));
+        base3 = new Base(this, findViewById(R.id.base3), activeBases);
         base3.setX((float) (screenWidth * 0.8));
         base3.setY(screenHeight);
 
